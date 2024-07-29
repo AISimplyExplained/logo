@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { toast } from "sonner";
+import { ColorSwatch } from "@/components/ColorSwatch";
 
 const DiamondLogoCreator: React.FC = () => {
   const [colors, setColors] = useState<string[]>([
@@ -92,6 +93,11 @@ const DiamondLogoCreator: React.FC = () => {
   };
 
   const generateColorsFromPrompt = async () => {
+    if (!prompt.trim()) {
+      toast.error("Please enter a prompt before generating colors.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = (await axios.post("/api/color", { prompt })).data;
@@ -119,7 +125,7 @@ const DiamondLogoCreator: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto my-4">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">
           Diamond Logo Creator
@@ -143,48 +149,45 @@ const DiamondLogoCreator: React.FC = () => {
               className="hidden"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="prompt">Prompt</Label>
+          <div className="space-y-3">
+            <Label htmlFor="prompt" className="">
+              Prompt
+            </Label>
             <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              className="resize-none"
             />
-            <Button onClick={generateColorsFromPrompt} disabled={isLoading}>
+            <Button
+              onClick={generateColorsFromPrompt}
+              disabled={isLoading || !prompt.trim()}
+            >
               Generate
             </Button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="flex flex-wrap justify-start gap-6 items-center">
             {colors.map((color, index) => (
-              <div key={index} className="flex flex-col items-center space-y-2">
-                <Input
-                  type="color"
-                  value={color}
-                  onChange={(e) => handleColorChange(index, e.target.value)}
-                  className="w-full h-10 cursor-pointer"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeColor(index)}
-                  className="rounded-full"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
+              <ColorSwatch
+                key={index}
+                color={color}
+                index={index}
+                handleColorChange={handleColorChange}
+                removeColor={removeColor}
+              />
             ))}
-            <Button
-              onClick={addColor}
-              className="h-24 flex flex-col items-center justify-center"
-            >
-              <Plus className="h-6 w-6" />
-              <span>Add Color</span>
-            </Button>
           </div>
+          <Button onClick={addColor}>Add Color</Button>
           <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Gradient Angle: {angle}°
-            </label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="gradient-angle" className="text-sm font-medium">
+                Gradient Angle
+              </Label>
+              <span className="text-sm font-medium bg-secondary text-secondary-foreground px-2 py-2 rounded-full">
+                {angle}°
+              </span>
+            </div>
             <Slider
+              id="gradient-angle"
               min={0}
               max={360}
               step={1}
