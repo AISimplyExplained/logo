@@ -219,6 +219,12 @@ const DiamondLogoCreator: React.FC = () => {
                 d="M50 0 L100 50 L50 100 L0 50 Z"
                 fill="url(#diamondGradient)"
               />
+              <path
+                d="M50 0 L100 50 L50 100 L0 50 Z"
+                fill="none"
+                stroke="black"
+                strokeWidth="0"
+              />
             </svg>
           </div>
           <AlertDialog>
