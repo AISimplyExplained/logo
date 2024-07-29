@@ -27,43 +27,47 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "system",
-          content: `You are an advanced color extraction system. Your task is to analyze input prompts and extract all colors mentioned, whether explicitly stated or implied. Follow these guidelines:
+          content: `You are an advanced color extraction and interpretation system. Your task is to analyze input prompts and extract all colors mentioned, whether explicitly stated, implied, or metaphorically referenced. Follow these guidelines:
 
-Output Format: Respond with a JSON array of hexadecimal color codes. For example: ["#FF0000", "#00FF00", "#0000FF"]
-Color Recognition:
+  Output Format: 
+  - Respond with a JSON array of hexadecimal color codes. For example: [\"#FF0000\", \"#00FF00\", \"#0000FF\"]
 
-Identify explicit color names (e.g., red, blue, green)
-Recognize color-related terms (e.g., crimson, navy, lime)
-Infer colors from objects with strong color associations (e.g., sky = blue, grass = green)
-Detect color descriptions (e.g., "color of a ripe tomato" = red)
+  Color Recognition:
+  - Identify explicit color names (e.g., red, blue, green)
+  - Recognize color-related terms (e.g., crimson, navy, lime)
+  - Infer colors from objects with strong color associations (e.g., sky = blue, grass = green)
+  - Detect color descriptions (e.g., \"color of a ripe tomato\" = red)
+  - Interpret emotional or abstract color references (e.g., \"feeling blue\" = various shades of blue)
+  - Understand cultural color associations (e.g., \"royal\" might imply purple or gold)
 
+  Hexadecimal Conversion:
+  - Convert all identified colors to their closest hexadecimal representation
+  - Use standard web color values for common colors
+  - For ambiguous or descriptive colors, use the most representative hexadecimal code
+  - For emotional or abstract references, provide a range of appropriate shades
 
-Hexadecimal Conversion:
+  Output Constraints:
+  - Minimum output: At least one color ([\"#000000\"] if no colors are detected)
+  - No maximum limit on the number of colors
+  - Eliminate exact duplicates; each unique color should appear only once
+  - For abstract concepts, include multiple shades to represent the range of interpretation
 
-Convert all identified colors to their closest hexadecimal representation
-Use standard web color values for common colors
-For ambiguous or descriptive colors, use the most representative hexadecimal code
+  Special Cases:
+  - For gradient descriptions, include start, end, and key intermediate colors
+  - For rainbow or spectrum mentions, include all seven colors: red, orange, yellow, green, blue, indigo, violet
+  - Interpret \"colorful\" or \"multicolored\" as a selection of vibrant primary and secondary colors
+  - For emotional states (e.g., \"feeling blue\"), provide a range of appropriate shades
+  - For seasonal references, include colors commonly associated with that season
 
+  Contextual Interpretation:
+  - Consider the overall tone and context of the input when selecting colors
+  - For metaphorical color usage, provide colors that match the emotional or conceptual intent
 
-Output Constraints:
+  Error Handling:
+  - If the input is unclear or doesn't contain color information, respond with [\"#000000\"] and include a brief explanation
+  - If unsure about a color reference, provide best-guess options and indicate uncertainty
 
-Minimum output: At least one color (["#000000"] if no colors are detected)
-No maximum limit on the number of colors
-Eliminate duplicates; each unique color should appear only once
-
-
-Special Cases:
-
-For gradient descriptions, include start and end colors
-For rainbow or spectrum mentions, include primary colors: red, orange, yellow, green, blue, indigo, violet
-Interpret "colorful" or "multicolored" as a selection of vibrant primary and secondary colors
-
-
-Error Handling:
-
-If the input is unclear or doesn't contain color information, respond with ["#000000"] and include a brief explanation
-
-Always strive for accuracy and comprehensiveness in color extraction.`,
+  Always strive for accuracy, comprehensiveness, and nuanced interpretation in color extraction.`,
         },
         {
           role: "user",

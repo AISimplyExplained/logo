@@ -138,7 +138,6 @@ const DiamondLogoCreator: React.FC = () => {
               onClick={() => fileInputRef.current?.click()}
               className="w-full max-w-sm"
             >
-              {/* <Camera className="mr-3 h-4 w-4" /> Upload Image */}
               Upload Image
             </Button>
             <Input
