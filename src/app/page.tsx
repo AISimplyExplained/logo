@@ -198,9 +198,9 @@ const DiamondLogoCreator: React.FC = () => {
           <div className="flex justify-center">
             <svg
               ref={svgRef}
-              width="200"
+              width="400"
               height="200"
-              viewBox="0 0 100 100"
+              viewBox="0 0 200 100"
               className="w-full max-w-xs"
             >
               <defs>
@@ -218,11 +218,11 @@ const DiamondLogoCreator: React.FC = () => {
                 </linearGradient>
               </defs>
               <path
-                d="M50 0 L100 50 L50 100 L0 50 Z"
+                d="M100 0 L200 50 L100 100 L0 50 Z"
                 fill="url(#diamondGradient)"
               />
               <path
-                d="M50 0 L100 50 L50 100 L0 50 Z"
+                d="M100 0 L200 50 L100 100 L0 50 Z"
                 fill="none"
                 stroke="black"
                 strokeWidth="0"
