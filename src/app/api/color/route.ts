@@ -9,7 +9,7 @@ interface RequestBody {
   prompt?: string;
 }
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const { prompt } = (await request.json()) as RequestBody;
