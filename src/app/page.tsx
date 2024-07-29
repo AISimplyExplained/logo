@@ -15,15 +15,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Camera, Plus, X, Download } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
+import { toast } from "sonner";
 
-const Page: React.FC = () => {
+const DiamondLogoCreator: React.FC = () => {
   const [colors, setColors] = useState<string[]>([
     "#FF0000",
     "#00FF00",
     "#0000FF",
   ]);
+  const [prompt, setPrompt] = useState<string>("");
   const [angle, setAngle] = useState<number>(45);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleColorChange = (index: number, color: string): void => {
     const newColors = [...colors];
@@ -83,6 +91,17 @@ const Page: React.FC = () => {
       .map(([color]) => color);
   };
 
+  const generateColorsFromPrompt = async () => {
+    setIsLoading(true);
+    try {
+      const res = (await axios.post("/api/color", { prompt })).data;
+      setColors(res.colors);
+    } catch (error) {
+      toast.error("Please try Again");
+    }
+    setIsLoading(false);
+  };
+
   const exportSVG = (): void => {
     if (svgRef.current) {
       const svgData = new XMLSerializer().serializeToString(svgRef.current);
@@ -100,68 +119,113 @@ const Page: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle>Diamond Logo Creator</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">
+          Diamond Logo Creator
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div>
-            <Input type="file" accept="image/*" onChange={handleImageUpload} />
+        <div className="space-y-6">
+          <div className="flex flex-col items-center">
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              variant="outline"
+              className="w-full max-w-sm"
+            >
+              <Camera className="mr-3 h-4 w-4" /> Upload Image
+            </Button>
+            <Input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-2">
+            <Label htmlFor="prompt">Prompt</Label>
+            <Textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+            <Button onClick={generateColorsFromPrompt} disabled={isLoading}>
+              Generate
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
             {colors.map((color, index) => (
-              <div key={index} className="flex items-center space-x-2">
+              <div key={index} className="flex flex-col items-center space-y-2">
                 <Input
                   type="color"
                   value={color}
                   onChange={(e) => handleColorChange(index, e.target.value)}
-                  className="w-10 h-10"
+                  className="w-full h-10 cursor-pointer"
                 />
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => removeColor(index)}
+                  className="rounded-full"
                 >
-                  X
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             ))}
-            <Button onClick={addColor}>Add Color</Button>
+            <Button
+              onClick={addColor}
+              className="h-24 flex flex-col items-center justify-center"
+            >
+              <Plus className="h-6 w-6" />
+              <span>Add Color</span>
+            </Button>
           </div>
-          <div>
-            <label>Gradient Angle: {angle}°</label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">
+              Gradient Angle: {angle}°
+            </label>
             <Slider
               min={0}
               max={360}
               step={1}
               value={[angle]}
               onValueChange={(value) => setAngle(value[0])}
+              className="w-full"
             />
           </div>
-          <svg ref={svgRef} width="200" height="200" viewBox="0 0 100 100">
-            <defs>
-              <linearGradient
-                id="diamondGradient"
-                gradientTransform={`rotate(${angle})`}
-              >
-                {colors.map((color, index) => (
-                  <stop
-                    key={index}
-                    offset={`${(index / (colors.length - 1)) * 100}%`}
-                    stopColor={color}
-                  />
-                ))}
-              </linearGradient>
-            </defs>
-            <path
-              d="M50 0 L100 50 L50 100 L0 50 Z"
-              fill="url(#diamondGradient)"
-            />
-          </svg>
+          <div className="flex justify-center">
+            <svg
+              ref={svgRef}
+              width="200"
+              height="200"
+              viewBox="0 0 100 100"
+              className="w-full max-w-xs"
+            >
+              <defs>
+                <linearGradient
+                  id="diamondGradient"
+                  gradientTransform={`rotate(${angle})`}
+                >
+                  {colors.map((color, index) => (
+                    <stop
+                      key={index}
+                      offset={`${(index / (colors.length - 1)) * 100}%`}
+                      stopColor={color}
+                    />
+                  ))}
+                </linearGradient>
+              </defs>
+              <path
+                d="M50 0 L100 50 L50 100 L0 50 Z"
+                fill="url(#diamondGradient)"
+              />
+            </svg>
+          </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button>Export SVG</Button>
+              <Button className="w-full">
+                <Download className="mr-2 h-4 w-4" /> Export SVG
+              </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -183,4 +247,4 @@ const Page: React.FC = () => {
   );
 };
 
-export default Page;
+export default DiamondLogoCreator;
