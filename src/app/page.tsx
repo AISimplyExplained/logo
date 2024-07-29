@@ -133,13 +133,13 @@ const DiamondLogoCreator: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-start">
             <Button
               onClick={() => fileInputRef.current?.click()}
-              variant="outline"
               className="w-full max-w-sm"
             >
-              <Camera className="mr-3 h-4 w-4" /> Upload Image
+              {/* <Camera className="mr-3 h-4 w-4" /> Upload Image */}
+              Upload Image
             </Button>
             <Input
               ref={fileInputRef}
