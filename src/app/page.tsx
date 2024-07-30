@@ -279,50 +279,50 @@ const DiamondLogoCreator: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto my-4">
-      <CardHeader>
+    <Card className="w-full max-w-4xl mx-auto my-8">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-start space-x-4">
           <img
             src="dlogo.jpg"
             alt="Logo Creator"
-            className="w-12 h-12 object-cover rounded"
+            className="w-16 h-16 object-cover rounded"
           />
+          <CardTitle className="text-3xl font-bold">
+            Diamond Logo Diffuser
+          </CardTitle>
         </div>
-        <CardTitle className="text-2xl font-bold text-center">
-          Diamond Logo Creator
-        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="space-y-10">
+          <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1 flex flex-col">
               <Label
                 htmlFor="image-upload"
-                className="text-sm font-medium mb-2"
+                className="text-lg font-medium mb-4"
               >
                 Upload Image
               </Label>
-              <div className="flex-1 flex flex-col justify-between gap-4">
-                <div className="w-20 h-20 mr-4 relative">
+              <div className="flex-1 flex flex-col justify-between gap-6">
+                <div className="w-40 h-40 mr-4 relative">
                   {previewImage ? (
                     <>
                       <img
                         src={previewImage}
                         alt="Uploaded preview"
-                        className="w-full h-full object-cover rounded-full"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={removeImage}
-                        className="absolute top-0 right-0 z-10 rounded-full bg-background border border-input h-6 w-6 p-0"
+                        className="absolute top-2 right-2 z-10 rounded-full bg-background border border-input h-8 w-8 p-0"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-4 w-4" />
                       </Button>
                     </>
                   ) : (
-                    <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
-                      <Camera className="h-8 w-8 text-gray-400" />
+                    <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                      <Camera className="h-16 w-16 text-gray-400" />
                     </div>
                   )}
                 </div>
@@ -330,7 +330,7 @@ const DiamondLogoCreator: React.FC = () => {
                   onClick={() => fileInputRef.current?.click()}
                   className="flex-grow"
                 >
-                  <Upload className="mr-2 h-4 w-4" />
+                  <Upload className="mr-2 h-5 w-5" />
                   Choose Image
                 </Button>
                 <Input
@@ -344,7 +344,7 @@ const DiamondLogoCreator: React.FC = () => {
               </div>
             </div>
             <div className="flex-1 flex flex-col">
-              <Label htmlFor="prompt" className="text-sm font-medium mb-2">
+              <Label htmlFor="prompt" className="text-lg font-medium mb-4">
                 Prompt
               </Label>
               <div className="flex-1 flex flex-col">
@@ -353,7 +353,7 @@ const DiamondLogoCreator: React.FC = () => {
                   value={prompt}
                   placeholder="I am feeling blue"
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="resize-none flex-grow mb-2"
+                  className="resize-none flex-grow mb-4"
                 />
                 <Button
                   onClick={generateColorsFromPrompt}
@@ -376,26 +376,30 @@ const DiamondLogoCreator: React.FC = () => {
                 removeColor={removeColor}
               />
             ))}
+            <Button onClick={addColor} className="h-12 w-12 rounded-full p-0">
+              <Plus className="h-6 w-6" />
+            </Button>
           </div>
-          <Button onClick={addColor}>Add Color</Button>
-          <div className="flex items-center space-x-2">
+
+          <div className="flex items-center space-x-4">
             <Switch
               id="mesh-gradient"
               checked={isMeshGradient}
               onCheckedChange={setIsMeshGradient}
             />
-            <Label htmlFor="mesh-gradient">Use Mesh Gradient</Label>
+            <Label htmlFor="mesh-gradient" className="text-lg">Use Mesh Gradient</Label>
+            {isMeshGradient && (
+              <Button onClick={regenerateMesh}>Regenerate Mesh</Button>
+            )}
           </div>
-          {isMeshGradient && (
-            <Button onClick={regenerateMesh}>Regenerate Mesh</Button>
-          )}
+
           {!isMeshGradient && (
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <Label htmlFor="gradient-angle" className="text-sm font-medium">
+                <Label htmlFor="gradient-angle" className="text-lg font-medium">
                   Gradient Angle
                 </Label>
-                <span className="text-sm font-medium bg-secondary text-secondary-foreground px-2 py-2 rounded-full">
+                <span className="text-lg font-medium bg-secondary text-secondary-foreground px-3 py-1 rounded-full">
                   {angle}°
                 </span>
               </div>
@@ -410,9 +414,10 @@ const DiamondLogoCreator: React.FC = () => {
               />
             </div>
           )}
+
           <div className="flex justify-center">
             {isMeshGradient ? (
-              <div className="relative w-full max-w-xs aspect-[2/1]">
+              <div className="relative w-full max-w-md aspect-[2/1]">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div
                     className="w-full h-full"
@@ -423,8 +428,8 @@ const DiamondLogoCreator: React.FC = () => {
                     <canvas
                       id="mesh-canvas"
                       ref={canvasRef}
-                      width={500}
-                      height={250}
+                      width={600}
+                      height={300}
                       className="w-full h-full"
                     />
                   </div>
@@ -433,10 +438,10 @@ const DiamondLogoCreator: React.FC = () => {
             ) : (
               <svg
                 ref={svgRef}
-                width="400"
-                height="200"
+                width="500"
+                height="250"
                 viewBox="0 0 300 150"
-                className="w-full max-w-xs"
+                className="w-full max-w-md"
               >
                 <defs>
                   <linearGradient
@@ -459,31 +464,34 @@ const DiamondLogoCreator: React.FC = () => {
               </svg>
             )}
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button className="w-full">
-                <Download className="mr-2 h-4 w-4" /> Export{" "}
-                {isMeshGradient ? "PNG" : "SVG"}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Export {isMeshGradient ? "PNG" : "SVG"}
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  Your diamond logo{" "}
-                  {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready
-                  to download.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogAction onClick={exportImage}>
-                  Download
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+
+          <div className="flex gap-4">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="flex-1">
+                  <Download className="mr-2 h-5 w-5" /> Export {isMeshGradient ? "PNG" : "SVG"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Export {isMeshGradient ? "PNG" : "SVG"}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Your diamond logo {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready to download.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction onClick={exportImage}>
+                    Download
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <Button className="flex-1" onClick={copyToClipboard}>
+              <ClipboardCopy className="mr-2 h-5 w-5" /> Copy SVG
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
