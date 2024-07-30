@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Camera, Plus, X, Download } from "lucide-react";
+import { Camera, Plus, X, Download, Upload, ClipboardCopy } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -30,6 +30,7 @@ const DiamondLogoCreator: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isMeshGradient, setIsMeshGradient] = useState<boolean>(false);
   const [meshId, setMeshId] = useState<number>(780);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -120,6 +121,7 @@ const DiamondLogoCreator: React.FC = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
+        setPreviewImage(e.target?.result as string);
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
@@ -216,6 +218,66 @@ const DiamondLogoCreator: React.FC = () => {
     }
   };
 
+  const removeImage = (): void => {
+    setPreviewImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const convertCanvasToSVG = () => {
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      if(!ctx) return ""
+      const svgNS = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("width", canvas.width.toString());
+      svg.setAttribute("height", canvas.height.toString());
+
+      // This is a simplified conversion. You may need to add more logic
+      // depending on what's actually drawn on your canvas.
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const index = (y * canvas.width + x) * 4;
+          if (imageData.data[index + 3] > 0) {
+            // If pixel is not transparent
+            const rect = document.createElementNS(svgNS, "rect");
+            rect.setAttribute("x", x.toString());
+            rect.setAttribute("y", y.toString());
+            rect.setAttribute("width", "1");
+            rect.setAttribute("height", "1");
+            rect.setAttribute(
+              "fill",
+              `rgb(${imageData.data[index]}, ${imageData.data[index + 1]}, ${
+                imageData.data[index + 2]
+              })`
+            );
+            svg.appendChild(rect);
+          }
+        }
+      }
+
+      const serializer = new XMLSerializer();
+      return serializer.serializeToString(svg);
+    }
+    return "";
+  };
+
+  const copyToClipboard = () => {
+    const svgString = convertCanvasToSVG();
+    console.log("string", svgString)
+    navigator.clipboard
+      .writeText(svgString)
+      .then(() => {
+        alert("SVG copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  };
+
   return (
     <Card className="w-full max-w-4xl mx-auto my-4">
       <CardHeader>
@@ -232,38 +294,78 @@ const DiamondLogoCreator: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div className="flex flex-col items-center justify-start">
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full max-w-sm"
-            >
-              Upload Image
-            </Button>
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 flex flex-col">
+              <Label
+                htmlFor="image-upload"
+                className="text-sm font-medium mb-2"
+              >
+                Upload Image
+              </Label>
+              <div className="flex-1 flex flex-col justify-between gap-4">
+                <div className="w-20 h-20 mr-4 relative">
+                  {previewImage ? (
+                    <>
+                      <img
+                        src={previewImage}
+                        alt="Uploaded preview"
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={removeImage}
+                        className="absolute top-0 right-0 z-10 rounded-full bg-background border border-input h-6 w-6 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
+                      <Camera className="h-8 w-8 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-grow"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Choose Image
+                </Button>
+                <Input
+                  id="image-upload"
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col">
+              <Label htmlFor="prompt" className="text-sm font-medium mb-2">
+                Prompt
+              </Label>
+              <div className="flex-1 flex flex-col">
+                <Textarea
+                  id="prompt"
+                  value={prompt}
+                  placeholder="I am feeling blue"
+                  onChange={(e) => setPrompt(e.target.value)}
+                  className="resize-none flex-grow mb-2"
+                />
+                <Button
+                  onClick={generateColorsFromPrompt}
+                  disabled={isLoading || !prompt.trim()}
+                  className="w-full"
+                >
+                  Generate
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="space-y-3">
-            <Label htmlFor="prompt" className="">
-              Prompt
-            </Label>
-            <Textarea
-              value={prompt}
-              placeholder={'I am feeling blue'}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="resize-none"
-            />
-            <Button
-              onClick={generateColorsFromPrompt}
-              disabled={isLoading || !prompt.trim()}
-            >
-              Generate
-            </Button>
-          </div>
+
           <div className="flex flex-wrap justify-start gap-6 items-center">
             {colors.map((color, index) => (
               <ColorSwatch
