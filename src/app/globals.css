@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.clip-path-diamond {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState, useRef, useEffect, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import axios from "axios";
 import { toast } from "sonner";
 import { ColorSwatch } from "@/components/ColorSwatch";
-import MeshGradient from 'mesh-gradient.js';
+import MeshGradient from "mesh-gradient.js";
 
 const DiamondLogoCreator: React.FC = () => {
   const [colors, setColors] = useState<string[]>(["#ee99ff", "#5effd0"]);
@@ -49,15 +49,15 @@ const DiamondLogoCreator: React.FC = () => {
   const applyDiamondMask = () => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (ctx) {
         const { width, height } = canvas;
 
         // Create a temporary canvas to hold the original gradient
-        const tempCanvas = document.createElement('canvas');
+        const tempCanvas = document.createElement("canvas");
         tempCanvas.width = width;
         tempCanvas.height = height;
-        const tempCtx = tempCanvas.getContext('2d');
+        const tempCtx = tempCanvas.getContext("2d");
         if (tempCtx) {
           tempCtx.drawImage(canvas, 0, 0);
 
@@ -128,7 +128,12 @@ const DiamondLogoCreator: React.FC = () => {
           const ctx = canvas.getContext("2d");
           if (ctx) {
             ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height
+            );
             const extractedColors = extractColors(imageData.data);
             setColors(extractedColors);
             if (isMeshGradient && gradientRef.current) {
@@ -188,7 +193,9 @@ const DiamondLogoCreator: React.FC = () => {
       document.body.removeChild(downloadLink);
     } else if (svgRef.current) {
       const svgData = new XMLSerializer().serializeToString(svgRef.current);
-      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const svgBlob = new Blob([svgData], {
+        type: "image/svg+xml;charset=utf-8",
+      });
       const svgUrl = URL.createObjectURL(svgBlob);
       const downloadLink = document.createElement("a");
       downloadLink.href = svgUrl;
@@ -212,15 +219,24 @@ const DiamondLogoCreator: React.FC = () => {
   return (
     <Card className="w-full max-w-4xl mx-auto my-4">
       <CardHeader>
-        <div className="flex items-center justify-center space-x-4">
-          <img src="dlogo.jpg" alt="Logo Creator" className="w-12 h-12 object-cover rounded" />
-          <CardTitle className="text-2xl font-bold text-center">Diamond Logo Creator</CardTitle>
+        <div className="flex items-center justify-start space-x-4">
+          <img
+            src="dlogo.jpg"
+            alt="Logo Creator"
+            className="w-12 h-12 object-cover rounded"
+          />
         </div>
+        <CardTitle className="text-2xl font-bold text-center">
+          Diamond Logo Creator
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div className="flex flex-col items-center justify-start">
-            <Button onClick={() => fileInputRef.current?.click()} className="w-full max-w-sm">
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full max-w-sm"
+            >
               Upload Image
             </Button>
             <Input
@@ -232,14 +248,19 @@ const DiamondLogoCreator: React.FC = () => {
             />
           </div>
           <div className="space-y-3">
-            <Label htmlFor="prompt" className="">Prompt</Label>
+            <Label htmlFor="prompt" className="">
+              Prompt
+            </Label>
             <Textarea
               value={prompt}
               placeholder={'I am feeling blue'}
               onChange={(e) => setPrompt(e.target.value)}
               className="resize-none"
             />
-            <Button onClick={generateColorsFromPrompt} disabled={isLoading || !prompt.trim()}>
+            <Button
+              onClick={generateColorsFromPrompt}
+              disabled={isLoading || !prompt.trim()}
+            >
               Generate
             </Button>
           </div>
@@ -290,18 +311,36 @@ const DiamondLogoCreator: React.FC = () => {
           <div className="flex justify-center">
             {isMeshGradient ? (
               <div className="relative w-full max-w-xs aspect-[2/1]">
-                <canvas
-                  id="mesh-canvas"
-                  ref={canvasRef}
-                  width={300}
-                  height={150}
-                  className="w-full h-full"
-                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div
+                    className="w-full h-full"
+                    style={{
+                      clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                    }}
+                  >
+                    <canvas
+                      id="mesh-canvas"
+                      ref={canvasRef}
+                      width={500}
+                      height={250}
+                      className="w-full h-full"
+                    />
+                  </div>
+                </div>
               </div>
             ) : (
-              <svg ref={svgRef} width="400" height="200" viewBox="0 0 300 150" className="w-full max-w-xs">
+              <svg
+                ref={svgRef}
+                width="400"
+                height="200"
+                viewBox="0 0 300 150"
+                className="w-full max-w-xs"
+              >
                 <defs>
-                  <linearGradient id="diamondGradient" gradientTransform={`rotate(${angle})`}>
+                  <linearGradient
+                    id="diamondGradient"
+                    gradientTransform={`rotate(${angle})`}
+                  >
                     {colors.map((color, index) => (
                       <stop
                         key={index}
@@ -321,18 +360,25 @@ const DiamondLogoCreator: React.FC = () => {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button className="w-full">
-                <Download className="mr-2 h-4 w-4" /> Export {isMeshGradient ? 'PNG' : 'SVG'}
+                <Download className="mr-2 h-4 w-4" /> Export{" "}
+                {isMeshGradient ? "PNG" : "SVG"}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Export {isMeshGradient ? 'PNG' : 'SVG'}</AlertDialogTitle>
+                <AlertDialogTitle>
+                  Export {isMeshGradient ? "PNG" : "SVG"}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Your diamond logo {isMeshGradient ? 'with mesh gradient (PNG)' : 'SVG'} is ready to download.
+                  Your diamond logo{" "}
+                  {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready
+                  to download.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogAction onClick={exportImage}>Download</AlertDialogAction>
+                <AlertDialogAction onClick={exportImage}>
+                  Download
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
