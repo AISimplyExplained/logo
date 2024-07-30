@@ -339,7 +339,7 @@ const DiamondLogoCreator: React.FC = () => {
             </div>
             <div className="flex-1 space-y-4">
               <h3 className="text-lg font-medium">Or Describe Your Mood</h3>
-              <p className="text-sm">Enter a phrase or description to set the tone for your logo's colours, e.g., "I'm feeling blue" or "A warm sunset"</p>
+              <p className="text-sm">Enter a phrase or description to set the tone for your logo&apos;s colours, e.g., &quot;I&apos;m feeling blue&quot; or &quot;A warm sunset&quot;</p>
               <Textarea
                 id="prompt"
                 value={prompt}
@@ -361,7 +361,7 @@ const DiamondLogoCreator: React.FC = () => {
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-semibold mb-4">Dominant Colors Extraction</h2>
-            <p className="text-sm mb-4">Based on your input, we've extracted the dominant colours. Adjust and fine-tune them as needed.</p>
+            <p className="text-sm mb-4">Based on your input, we&apos;ve extracted the dominant colours. Adjust and fine-tune them as needed.</p>
             <div className="flex flex-wrap justify-start gap-6 items-center">
               {colors.map((color, index) => (
                 <ColorSwatch
