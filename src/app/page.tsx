@@ -280,126 +280,125 @@ const DiamondLogoCreator: React.FC = () => {
 
   return (
     <Card className="w-full max-w-4xl mx-auto my-8">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-start space-x-4">
+      <CardHeader className="pb-6">
+        <div className="flex items-center space-x-4">
           <img
-            src="dlogo.jpg"
+            src="dlogo.png"
             alt="Logo Creator"
-            className="w-16 h-16 object-cover rounded"
+            className="w-16 h-16 object-contain"
           />
-          <CardTitle className="text-3xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Diamond Logo Diffuser
           </CardTitle>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-10">
+      <CardContent className="space-y-10">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Choose Your Input Method:</h2>
           <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex-1 flex flex-col">
-              <Label
-                htmlFor="image-upload"
-                className="text-lg font-medium mb-4"
+            <div className="flex-1 space-y-4">
+              <h3 className="text-lg font-medium">Upload an Image for Inspiration</h3>
+              <p className="text-sm">Drag and drop or click to upload an image that captures the essence of your desired colours.</p>
+              <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center">
+                {previewImage ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={previewImage}
+                      alt="Uploaded preview"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={removeImage}
+                      className="absolute top-2 right-2 z-10 rounded-full bg-background border border-input h-6 w-6 p-0"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Camera className="h-16 w-16 text-gray-400" />
+                )}
+              </div>
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full text-sm"
+                variant="outline"
               >
-                Upload Image
-              </Label>
-              <div className="flex-1 flex flex-col justify-between gap-6">
-                <div className="w-40 h-40 mr-4 relative">
-                  {previewImage ? (
-                    <>
-                      <img
-                        src={previewImage}
-                        alt="Uploaded preview"
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={removeImage}
-                        className="absolute top-2 right-2 z-10 rounded-full bg-background border border-input h-8 w-8 p-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </>
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
-                      <Camera className="h-16 w-16 text-gray-400" />
-                    </div>
-                  )}
-                </div>
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex-grow"
-                >
-                  <Upload className="mr-2 h-5 w-5" />
-                  Choose Image
-                </Button>
-                <Input
-                  id="image-upload"
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </div>
-            </div>
-            <div className="flex-1 flex flex-col">
-              <Label htmlFor="prompt" className="text-lg font-medium mb-4">
-                Prompt
-              </Label>
-              <div className="flex-1 flex flex-col">
-                <Textarea
-                  id="prompt"
-                  value={prompt}
-                  placeholder="I am feeling blue"
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="resize-none flex-grow mb-4"
-                />
-                <Button
-                  onClick={generateColorsFromPrompt}
-                  disabled={isLoading || !prompt.trim()}
-                  className="w-full"
-                >
-                  Generate
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap justify-start gap-6 items-center">
-            {colors.map((color, index) => (
-              <ColorSwatch
-                key={index}
-                color={color}
-                index={index}
-                handleColorChange={handleColorChange}
-                removeColor={removeColor}
+                <Upload className="mr-2 h-4 w-4" />
+                Choose Image
+              </Button>
+              <Input
+                id="image-upload"
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
               />
-            ))}
-            <Button onClick={addColor} className="h-12 w-12 rounded-full p-0">
-              <Plus className="h-6 w-6" />
-            </Button>
+            </div>
+            <div className="flex-1 space-y-4">
+              <h3 className="text-lg font-medium">Or Describe Your Mood</h3>
+              <p className="text-sm">Enter a phrase or description to set the tone for your logo's colours, e.g., "I'm feeling blue" or "A warm sunset"</p>
+              <Textarea
+                id="prompt"
+                value={prompt}
+                placeholder="I am feeling blue"
+                onChange={(e) => setPrompt(e.target.value)}
+                className="resize-none h-40 text-sm"
+              />
+              <Button
+                onClick={generateColorsFromPrompt}
+                disabled={isLoading || !prompt.trim()}
+                className="w-full text-sm"
+              >
+                Generate
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Dominant Colors Extraction</h2>
+            <p className="text-sm mb-4">Based on your input, we've extracted the dominant colours. Adjust and fine-tune them as needed.</p>
+            <div className="flex flex-wrap justify-start gap-6 items-center">
+              {colors.map((color, index) => (
+                <ColorSwatch
+                  key={index}
+                  color={color}
+                  index={index}
+                  handleColorChange={handleColorChange}
+                  removeColor={removeColor}
+                />
+              ))}
+              <Button onClick={addColor} className="h-12 w-12 rounded-full p-0">
+                <Plus className="h-6 w-6" />
+              </Button>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <Switch
-              id="mesh-gradient"
-              checked={isMeshGradient}
-              onCheckedChange={setIsMeshGradient}
-            />
-            <Label htmlFor="mesh-gradient" className="text-lg">Use Mesh Gradient</Label>
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="mesh-gradient"
+                checked={isMeshGradient}
+                onCheckedChange={setIsMeshGradient}
+              />
+              <Label htmlFor="mesh-gradient" className="text-sm">Use Mesh Gradient</Label>
+            </div>
             {isMeshGradient && (
-              <Button onClick={regenerateMesh}>Regenerate Mesh</Button>
+              <Button onClick={regenerateMesh} size="sm">Regenerate Mesh</Button>
             )}
           </div>
 
           {!isMeshGradient && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <Label htmlFor="gradient-angle" className="text-lg font-medium">
+                <Label htmlFor="gradient-angle" className="text-sm font-medium">
                   Gradient Angle
                 </Label>
-                <span className="text-lg font-medium bg-secondary text-secondary-foreground px-3 py-1 rounded-full">
+                <span className="text-sm font-medium bg-secondary text-secondary-foreground px-3 py-1 rounded-full">
                   {angle}°
                 </span>
               </div>
@@ -414,84 +413,84 @@ const DiamondLogoCreator: React.FC = () => {
               />
             </div>
           )}
+        </div>
 
-          <div className="flex justify-center">
-            {isMeshGradient ? (
-              <div className="relative w-full max-w-md aspect-[2/1]">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div
+        <div className="flex justify-center">
+          {isMeshGradient ? (
+            <div className="relative w-full max-w-md aspect-[2/1]">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div
+                  className="w-full h-full"
+                  style={{
+                    clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                  }}
+                >
+                  <canvas
+                    id="mesh-canvas"
+                    ref={canvasRef}
+                    width={500}
+                    height={250}
                     className="w-full h-full"
-                    style={{
-                      clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                    }}
-                  >
-                    <canvas
-                      id="mesh-canvas"
-                      ref={canvasRef}
-                      width={600}
-                      height={300}
-                      className="w-full h-full"
-                    />
-                  </div>
+                  />
                 </div>
               </div>
-            ) : (
-              <svg
-                ref={svgRef}
-                width="500"
-                height="250"
-                viewBox="0 0 300 150"
-                className="w-full max-w-md"
-              >
-                <defs>
-                  <linearGradient
-                    id="diamondGradient"
-                    gradientTransform={`rotate(${angle})`}
-                  >
-                    {colors.map((color, index) => (
-                      <stop
-                        key={index}
-                        offset={`${(index / (colors.length - 1)) * 100}%`}
-                        stopColor={color}
-                      />
-                    ))}
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M150 0 L300 75 L150 150 L0 75 Z"
-                  fill="url(#diamondGradient)"
-                />
-              </svg>
-            )}
-          </div>
+            </div>
+          ) : (
+            <svg
+              ref={svgRef}
+              width="500"
+              height="250"
+              viewBox="0 0 300 150"
+              className="w-full max-w-md"
+            >
+              <defs>
+                <linearGradient
+                  id="diamondGradient"
+                  gradientTransform={`rotate(${angle})`}
+                >
+                  {colors.map((color, index) => (
+                    <stop
+                      key={index}
+                      offset={`${(index / (colors.length - 1)) * 100}%`}
+                      stopColor={color}
+                    />
+                  ))}
+                </linearGradient>
+              </defs>
+              <path
+                d="M150 0 L300 75 L150 150 L0 75 Z"
+                fill="url(#diamondGradient)"
+              />
+            </svg>
+          )}
+        </div>
 
-          <div className="flex gap-4">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="flex-1">
-                  <Download className="mr-2 h-5 w-5" /> Export {isMeshGradient ? "PNG" : "SVG"}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Export {isMeshGradient ? "PNG" : "SVG"}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Your diamond logo {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready to download.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogAction onClick={exportImage}>
-                    Download
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <Button className="flex-1" onClick={copyToClipboard}>
-              <ClipboardCopy className="mr-2 h-5 w-5" /> Copy SVG
-            </Button>
-          </div>
+        <div className="flex gap-6">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className="flex-1 text-sm">
+                <Download className="mr-2 h-4 w-4" /> Export {isMeshGradient ? "PNG" : "SVG"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Export {isMeshGradient ? "PNG" : "SVG"}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Your diamond logo {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready to download.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction onClick={exportImage}>
+                  Download
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button className="flex-1 text-sm" onClick={copyToClipboard}>
+            <ClipboardCopy className="mr-2 h-4 w-4" /> Copy SVG
+          </Button>
         </div>
       </CardContent>
     </Card>
