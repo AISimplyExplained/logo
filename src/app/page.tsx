@@ -235,6 +235,7 @@ const DiamondLogoCreator: React.FC = () => {
             <Label htmlFor="prompt" className="">Prompt</Label>
             <Textarea
               value={prompt}
+              placeholder={'I am feeling blue'}
               onChange={(e) => setPrompt(e.target.value)}
               className="resize-none"
             />
