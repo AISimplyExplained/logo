@@ -125,45 +125,10 @@ const DiamondLogoCreator: React.FC = () => {
       reader.onload = (e: ProgressEvent<FileReader>) => {
         setPreviewImage(e.target?.result as string);
         const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(
-              0,
-              0,
-              canvas.width,
-              canvas.height
-            );
-            const extractedColors = extractColors(imageData.data);
-            setColors(extractedColors);
-            if (isMeshGradient && gradientRef.current) {
-              gradientRef.current.changeGradientColors(extractedColors);
-              setTimeout(applyDiamondMask, 0);
-            }
-          }
-        };
         img.src = e.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const extractColors = (pixels: Uint8ClampedArray): string[] => {
-    const colorCounts: { [key: string]: number } = {};
-    for (let i = 0; i < pixels.length; i += 4) {
-      const color = `#${pixels[i].toString(16).padStart(2, "0")}${pixels[i + 1]
-        .toString(16)
-        .padStart(2, "0")}${pixels[i + 2].toString(16).padStart(2, "0")}`;
-      colorCounts[color] = (colorCounts[color] || 0) + 1;
-    }
-    return Object.entries(colorCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 7)
-      .map(([color]) => color);
   };
 
   const generateColorsFromPrompt = async () => {
@@ -269,6 +234,10 @@ const DiamondLogoCreator: React.FC = () => {
       const palette = colorThief.getPalette(imageRef.current, 10);
       const hexColors = palette.map(([r, g, b]) => rgbToHex(r, g, b));
       setColors(hexColors);
+      if (isMeshGradient && gradientRef.current) {
+        gradientRef.current.changeGradientColors(hexColors);
+        setTimeout(applyDiamondMask, 0);
+      }
       console.log("colors", hexColors)
     } catch (err) {
       console.error(err);
