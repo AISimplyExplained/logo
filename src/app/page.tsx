@@ -22,6 +22,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { ColorSwatch } from "@/components/ColorSwatch";
 import MeshGradient from "mesh-gradient.js";
+import ColorThief from 'colorthief';
 
 const DiamondLogoCreator: React.FC = () => {
   const [colors, setColors] = useState<string[]>(["#ee99ff", "#5effd0"]);
@@ -34,6 +35,7 @@ const DiamondLogoCreator: React.FC = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null)
   const gradientRef = useRef<any>(null);
 
   useEffect(() => {
@@ -256,6 +258,34 @@ const DiamondLogoCreator: React.FC = () => {
       });
   };
 
+  const extractColor = () => {
+    if (!imageRef.current || !previewImage) {
+      return;
+    }
+
+    const colorThief = new ColorThief();
+
+    try {
+      const palette = colorThief.getPalette(imageRef.current, 10);
+      const hexColors = palette.map(([r, g, b]) => rgbToHex(r, g, b));
+      setColors(hexColors);
+      console.log("colors", hexColors)
+    } catch (err) {
+      console.error(err);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    if (previewImage && imageRef.current) {
+      if (imageRef.current.complete) {
+        extractColor();
+      } else {
+        imageRef.current.onload = extractColor;
+      }
+    }
+  }, [previewImage]);
+
   return (
     <Card className="w-full max-w-4xl mx-auto my-8">
       <CardHeader className="pb-6">
@@ -288,6 +318,7 @@ const DiamondLogoCreator: React.FC = () => {
                 {previewImage ? (
                   <div className="relative w-full h-full">
                     <img
+                      ref={imageRef}
                       src={previewImage}
                       alt="Uploaded preview"
                       className="w-full h-full object-cover rounded-lg"
@@ -497,5 +528,12 @@ const DiamondLogoCreator: React.FC = () => {
     </Card>
   );
 };
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return '#' + [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('');
+}
 
 export default DiamondLogoCreator;
