@@ -225,53 +225,32 @@ const DiamondLogoCreator: React.FC = () => {
     }
   };
 
-  const convertCanvasToSVG = () => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      if(!ctx) return ""
-      const svgNS = "http://www.w3.org/2000/svg";
-      const svg = document.createElementNS(svgNS, "svg");
-      svg.setAttribute("width", canvas.width.toString());
-      svg.setAttribute("height", canvas.height.toString());
-
-      // This is a simplified conversion. You may need to add more logic
-      // depending on what's actually drawn on your canvas.
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-          const index = (y * canvas.width + x) * 4;
-          if (imageData.data[index + 3] > 0) {
-            // If pixel is not transparent
-            const rect = document.createElementNS(svgNS, "rect");
-            rect.setAttribute("x", x.toString());
-            rect.setAttribute("y", y.toString());
-            rect.setAttribute("width", "1");
-            rect.setAttribute("height", "1");
-            rect.setAttribute(
-              "fill",
-              `rgb(${imageData.data[index]}, ${imageData.data[index + 1]}, ${
-                imageData.data[index + 2]
-              })`
-            );
-            svg.appendChild(rect);
-          }
-        }
-      }
-
-      const serializer = new XMLSerializer();
-      return serializer.serializeToString(svg);
-    }
-    return "";
-  };
 
   const copyToClipboard = () => {
-    const svgString = convertCanvasToSVG();
-    console.log("string", svgString)
+    let svgString = "";
+    if (isMeshGradient && canvasRef.current) {
+      const canvasElement = canvasRef.current;
+      const canvasDataURL = canvasElement.toDataURL();
+
+      svgString = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${canvasElement.width}" height="${canvasElement.height}">
+          <foreignObject width="100%" height="100%">
+            <img src="${canvasDataURL}" width="100%" height="100%"/>
+          </foreignObject>
+        </svg>
+      `;
+    } else if (svgRef.current) {
+      const svgData = new XMLSerializer().serializeToString(svgRef.current);
+      svgString = svgData;
+    }
+    if (!svgString) {
+      toast.error("Error, Something went wrong.");
+      return;
+    }
     navigator.clipboard
       .writeText(svgString)
       .then(() => {
-        alert("SVG copied to clipboard!");
+        toast.success("Text copied successfully.");
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
@@ -294,11 +273,18 @@ const DiamondLogoCreator: React.FC = () => {
       </CardHeader>
       <CardContent className="space-y-10">
         <div>
-          <h2 className="text-xl font-semibold mb-4">Choose Your Input Method:</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Choose Your Input Method:
+          </h2>
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1 space-y-4">
-              <h3 className="text-lg font-medium">Upload an Image for Inspiration</h3>
-              <p className="text-sm">Drag and drop or click to upload an image that captures the essence of your desired colours.</p>
+              <h3 className="text-lg font-medium">
+                Upload an Image for Inspiration
+              </h3>
+              <p className="text-sm">
+                Drag and drop or click to upload an image that captures the
+                essence of your desired colours.
+              </p>
               <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center">
                 {previewImage ? (
                   <div className="relative w-full h-full">
@@ -339,7 +325,11 @@ const DiamondLogoCreator: React.FC = () => {
             </div>
             <div className="flex-1 space-y-4">
               <h3 className="text-lg font-medium">Or Describe Your Mood</h3>
-              <p className="text-sm">Enter a phrase or description to set the tone for your logo&apos;s colours, e.g., &quot;I&apos;m feeling blue&quot; or &quot;A warm sunset&quot;</p>
+              <p className="text-sm">
+                Enter a phrase or description to set the tone for your
+                logo&apos;s colours, e.g., &quot;I&apos;m feeling blue&quot; or
+                &quot;A warm sunset&quot;
+              </p>
               <Textarea
                 id="prompt"
                 value={prompt}
@@ -360,8 +350,13 @@ const DiamondLogoCreator: React.FC = () => {
 
         <div className="space-y-6">
           <div>
-            <h2 className="text-lg font-semibold mb-4">Dominant Colors Extraction</h2>
-            <p className="text-sm mb-4">Based on your input, we&apos;ve extracted the dominant colours. Adjust and fine-tune them as needed.</p>
+            <h2 className="text-lg font-semibold mb-4">
+              Dominant Colors Extraction
+            </h2>
+            <p className="text-sm mb-4">
+              Based on your input, we&apos;ve extracted the dominant colours.
+              Adjust and fine-tune them as needed.
+            </p>
             <div className="flex flex-wrap justify-start gap-6 items-center">
               {colors.map((color, index) => (
                 <ColorSwatch
@@ -385,10 +380,14 @@ const DiamondLogoCreator: React.FC = () => {
                 checked={isMeshGradient}
                 onCheckedChange={setIsMeshGradient}
               />
-              <Label htmlFor="mesh-gradient" className="text-sm">Use Mesh Gradient</Label>
+              <Label htmlFor="mesh-gradient" className="text-sm">
+                Use Mesh Gradient
+              </Label>
             </div>
             {isMeshGradient && (
-              <Button onClick={regenerateMesh} size="sm">Regenerate Mesh</Button>
+              <Button onClick={regenerateMesh} size="sm">
+                Regenerate Mesh
+              </Button>
             )}
           </div>
 
@@ -469,7 +468,8 @@ const DiamondLogoCreator: React.FC = () => {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button className="flex-1 text-sm">
-                <Download className="mr-2 h-4 w-4" /> Export {isMeshGradient ? "PNG" : "SVG"}
+                <Download className="mr-2 h-4 w-4" /> Export{" "}
+                {isMeshGradient ? "PNG" : "SVG"}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -478,7 +478,9 @@ const DiamondLogoCreator: React.FC = () => {
                   Export {isMeshGradient ? "PNG" : "SVG"}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Your diamond logo {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready to download.
+                  Your diamond logo{" "}
+                  {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready
+                  to download.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
