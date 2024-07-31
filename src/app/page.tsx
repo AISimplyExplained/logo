@@ -349,7 +349,7 @@ const DiamondLogoCreator: React.FC = () => {
 
         <div className="space-y-6 mb-10">
           <div>
-            <h2 className="text-lg font-semibold mb-4 mt-10">
+            <h2 className="text-lg font-semibold mb-4 mt-11">
               Dominant Colors Extraction
             </h2>
             <p className="text-sm mb-4">
@@ -392,7 +392,7 @@ const DiamondLogoCreator: React.FC = () => {
 
           {!isMeshGradient && (
             <div className="space-y-4">
-              <div className="flex justify-between items-center mt-10">
+              <div className="flex justify-between items-center mt-11">
                 <Label htmlFor="gradient-angle" className="text-sm font-medium">
                   Gradient Angle
                 </Label>
