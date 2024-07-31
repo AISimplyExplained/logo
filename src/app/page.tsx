@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Camera, Plus, X, Download, Upload, ClipboardCopy } from "lucide-react";
+import { Camera, Plus, X, Download, Upload, ClipboardCopy, RefreshCw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -225,7 +225,6 @@ const DiamondLogoCreator: React.FC = () => {
     }
   };
 
-
   const copyToClipboard = () => {
     let svgString = "";
     if (isMeshGradient && canvasRef.current) {
@@ -272,7 +271,7 @@ const DiamondLogoCreator: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-10">
-        <div>
+        <div className="mb-10">
           <h2 className="text-xl font-semibold mb-4">
             Choose Your Input Method:
           </h2>
@@ -348,7 +347,7 @@ const DiamondLogoCreator: React.FC = () => {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 mb-10">
           <div>
             <h2 className="text-lg font-semibold mb-4">
               Dominant Colors Extraction
@@ -386,7 +385,7 @@ const DiamondLogoCreator: React.FC = () => {
             </div>
             {isMeshGradient && (
               <Button onClick={regenerateMesh} size="sm">
-                Regenerate Mesh
+                <RefreshCw className="mr-2 h-4 w-4" /> Regenerate Mesh
               </Button>
             )}
           </div>
@@ -414,7 +413,7 @@ const DiamondLogoCreator: React.FC = () => {
           )}
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-10">
           {isMeshGradient ? (
             <div className="relative w-full max-w-md aspect-[2/1]">
               <div className="absolute inset-0 flex items-center justify-center">
