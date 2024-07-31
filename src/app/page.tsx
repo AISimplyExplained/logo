@@ -22,6 +22,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { ColorSwatch } from "@/components/ColorSwatch";
 import MeshGradient from "mesh-gradient.js";
+import ColorThief from 'colorthief';
 
 const DiamondLogoCreator: React.FC = () => {
   const [colors, setColors] = useState<string[]>(["#ee99ff", "#5effd0"]);
@@ -34,6 +35,7 @@ const DiamondLogoCreator: React.FC = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null)
   const gradientRef = useRef<any>(null);
 
   useEffect(() => {
@@ -123,45 +125,10 @@ const DiamondLogoCreator: React.FC = () => {
       reader.onload = (e: ProgressEvent<FileReader>) => {
         setPreviewImage(e.target?.result as string);
         const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(
-              0,
-              0,
-              canvas.width,
-              canvas.height
-            );
-            const extractedColors = extractColors(imageData.data);
-            setColors(extractedColors);
-            if (isMeshGradient && gradientRef.current) {
-              gradientRef.current.changeGradientColors(extractedColors);
-              setTimeout(applyDiamondMask, 0);
-            }
-          }
-        };
         img.src = e.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const extractColors = (pixels: Uint8ClampedArray): string[] => {
-    const colorCounts: { [key: string]: number } = {};
-    for (let i = 0; i < pixels.length; i += 4) {
-      const color = `#${pixels[i].toString(16).padStart(2, "0")}${pixels[i + 1]
-        .toString(16)
-        .padStart(2, "0")}${pixels[i + 2].toString(16).padStart(2, "0")}`;
-      colorCounts[color] = (colorCounts[color] || 0) + 1;
-    }
-    return Object.entries(colorCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 7)
-      .map(([color]) => color);
   };
 
   const generateColorsFromPrompt = async () => {
@@ -256,6 +223,38 @@ const DiamondLogoCreator: React.FC = () => {
       });
   };
 
+  const extractColor = () => {
+    if (!imageRef.current || !previewImage) {
+      return;
+    }
+
+    const colorThief = new ColorThief();
+
+    try {
+      const palette = colorThief.getPalette(imageRef.current, 10);
+      const hexColors = palette.map(([r, g, b]) => rgbToHex(r, g, b));
+      setColors(hexColors);
+      if (isMeshGradient && gradientRef.current) {
+        gradientRef.current.changeGradientColors(hexColors);
+        setTimeout(applyDiamondMask, 0);
+      }
+      console.log("colors", hexColors)
+    } catch (err) {
+      console.error(err);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    if (previewImage && imageRef.current) {
+      if (imageRef.current.complete) {
+        extractColor();
+      } else {
+        imageRef.current.onload = extractColor;
+      }
+    }
+  }, [previewImage]);
+
   return (
     <Card className="w-full max-w-4xl mx-auto my-8">
       <CardHeader className="pb-6">
@@ -288,6 +287,7 @@ const DiamondLogoCreator: React.FC = () => {
                 {previewImage ? (
                   <div className="relative w-full h-full">
                     <img
+                      ref={imageRef}
                       src={previewImage}
                       alt="Uploaded preview"
                       className="w-full h-full object-cover rounded-lg"
@@ -497,5 +497,12 @@ const DiamondLogoCreator: React.FC = () => {
     </Card>
   );
 };
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return '#' + [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('');
+}
 
 export default DiamondLogoCreator;
