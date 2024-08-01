@@ -280,7 +280,7 @@ const DiamondLogoCreator: React.FC = () => {
                 Upload an Image for Inspiration
               </h3>
               <p className="text-sm">
-                Drag and drop or click to upload an image that captures the
+                Upload an image that captures the
                 essence of your desired colours.
               </p>
               <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center">
