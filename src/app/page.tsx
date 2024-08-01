@@ -14,7 +14,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Camera, Plus, X, Download, Upload, ClipboardCopy, RefreshCw } from "lucide-react";
+import {
+  Camera,
+  Plus,
+  X,
+  Download,
+  Upload,
+  ClipboardCopy,
+  RefreshCw,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -22,7 +30,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { ColorSwatch } from "@/components/ColorSwatch";
 import MeshGradient from "mesh-gradient.js";
-import ColorThief from 'colorthief';
+import ColorThief from "colorthief";
 
 const DiamondLogoCreator: React.FC = () => {
   const [colors, setColors] = useState<string[]>(["#ee99ff", "#5effd0"]);
@@ -35,7 +43,7 @@ const DiamondLogoCreator: React.FC = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null)
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const gradientRef = useRef<any>(null);
 
   useEffect(() => {
@@ -152,6 +160,8 @@ const DiamondLogoCreator: React.FC = () => {
   };
 
   const exportImage = (): void => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     if (canvasRef.current) {
       const dataURL = canvasRef.current.toDataURL("image/png");
       const downloadLink = document.createElement("a");
@@ -160,18 +170,28 @@ const DiamondLogoCreator: React.FC = () => {
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
-    } else if (svgRef.current) {
-      const svgData = new XMLSerializer().serializeToString(svgRef.current);
-      const svgBlob = new Blob([svgData], {
-        type: "image/svg+xml;charset=utf-8",
-      });
-      const svgUrl = URL.createObjectURL(svgBlob);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = svgUrl;
-      downloadLink.download = "diamond_logo.svg";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+    } else if (svgRef.current && ctx) {
+      const svg = svgRef.current;
+      const svgData = new XMLSerializer().serializeToString(svg);
+
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const downloadLink = document.createElement("a");
+          downloadLink.href = url;
+          downloadLink.download = "diamond_logo.png";
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          URL.revokeObjectURL(url);
+        }, "image/png");
+      };
+      img.src = "data:image/svg+xml;base64," + btoa(svgData);
     }
   };
 
@@ -238,7 +258,7 @@ const DiamondLogoCreator: React.FC = () => {
         gradientRef.current.changeGradientColors(hexColors);
         setTimeout(applyDiamondMask, 0);
       }
-      console.log("colors", hexColors)
+      console.log("colors", hexColors);
     } catch (err) {
       console.error(err);
     } finally {
@@ -280,8 +300,8 @@ const DiamondLogoCreator: React.FC = () => {
                 Upload an Image for Inspiration
               </h3>
               <p className="text-sm">
-                Upload an image that captures the
-                essence of your desired colours.
+                Upload an image that captures the essence of your desired
+                colours.
               </p>
               <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center">
                 {previewImage ? (
@@ -467,19 +487,15 @@ const DiamondLogoCreator: React.FC = () => {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button className="flex-1 text-sm">
-                <Download className="mr-2 h-4 w-4" /> Export{" "}
-                {isMeshGradient ? "PNG" : "SVG"}
+                <Download className="mr-2 h-4 w-4" /> Export PNG
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Export {isMeshGradient ? "PNG" : "SVG"}
-                </AlertDialogTitle>
+                <AlertDialogTitle>Export PNG</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Your diamond logo{" "}
-                  {isMeshGradient ? "with mesh gradient (PNG)" : "SVG"} is ready
-                  to download.
+                  Your diamond logo with mesh gradient (PNG) is ready to
+                  download.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -499,10 +515,15 @@ const DiamondLogoCreator: React.FC = () => {
 };
 
 function rgbToHex(r: number, g: number, b: number): string {
-  return '#' + [r, g, b].map(x => {
-    const hex = x.toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  }).join('');
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")
+  );
 }
 
 export default DiamondLogoCreator;
