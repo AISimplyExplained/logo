@@ -14,15 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Camera,
-  Plus,
-  X,
-  Download,
-  Upload,
-  ClipboardCopy,
-  RefreshCw,
-} from "lucide-react";
+import { Camera, Plus, X, Download, Upload, RefreshCw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -210,37 +202,6 @@ const DiamondLogoCreator: React.FC = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };
-
-  const copyToClipboard = () => {
-    let svgString = "";
-    if (isMeshGradient && canvasRef.current) {
-      const canvasElement = canvasRef.current;
-      const canvasDataURL = canvasElement.toDataURL();
-
-      svgString = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${canvasElement.width}" height="${canvasElement.height}">
-          <foreignObject width="100%" height="100%">
-            <img src="${canvasDataURL}" width="100%" height="100%"/>
-          </foreignObject>
-        </svg>
-      `;
-    } else if (svgRef.current) {
-      const svgData = new XMLSerializer().serializeToString(svgRef.current);
-      svgString = svgData;
-    }
-    if (!svgString) {
-      toast.error("Error, Something went wrong.");
-      return;
-    }
-    navigator.clipboard
-      .writeText(svgString)
-      .then(() => {
-        toast.success("Text copied successfully.");
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-      });
   };
 
   const extractColor = () => {
@@ -505,9 +466,6 @@ const DiamondLogoCreator: React.FC = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button className="flex-1 text-sm" onClick={copyToClipboard}>
-            <ClipboardCopy className="mr-2 h-4 w-4" /> Copy SVG
-          </Button>
         </div>
       </CardContent>
     </Card>
